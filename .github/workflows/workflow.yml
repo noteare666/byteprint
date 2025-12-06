@@ -1,0 +1,45 @@
+name: 自动打包并上传到 PyPI（无依赖+pyproject.toml）
+
+# 触发条件：精简为「打 Tag 或发布 Release」（更贴合正式发布场景）
+on:
+  push:
+    tags:  # 推送 Tag 时触发（如 v1.2.0）
+      - 'v*'
+  release:
+    types: [ published ]  # 发布 GitHub Release 时触发
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      # 步骤 1：拉取代码
+      - name:  checkout 代码
+        uses: actions/checkout@v4
+
+      # 步骤 2：配置 Python 环境（适配主流版本）
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']  # 多版本兼容测试
+          cache: 'pip'  # 缓存 pip，加速依赖安装
+
+      # 步骤 3：安装打包/上传工具（无项目依赖，仅需基础工具）
+      - name: 安装 build + twine
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine  # 仅需这两个工具（build 适配 pyproject.toml）
+
+      # 步骤 4：用 build 工具打包（适配 pyproject.toml，无依赖更快速）
+      - name: 构建 Python 包（whl + tar.gz）
+        run: |
+          python -m build  # 自动读取 pyproject.toml，生成 dist/ 产物
+          twine check dist/*  # 验证包完整性（无依赖场景下基本不会报错）
+
+      # 步骤 5：安全上传到 PyPI
+      - name: 上传到 PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: pypi-AgEIcHlwaS5vcmcCJDIzOGJkOTg3LTdlYTctNGM5ZC1iOWNkLTlhODI2YWRmNWZkNAACKlszLCJhOWMxNzNmNC1jZjAxLTRmOWEtYWFhYi0wZmM2NDgxNmY4NDciXQAABiA1DE6s5xR90TpPcz2S7THe904bjJQrMyyt9oyKqZVBWQ
+          # 可选：测试环境上传（测试时取消注释）
+          # repository_url: https://test.pypi.org/legacy/
