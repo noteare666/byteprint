@@ -11,17 +11,18 @@ on:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    # 新增矩阵配置，支持多 Python 版本
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
-      # 步骤 1：拉取代码
-      - name:  checkout 代码
+      - name: checkout 代码
         uses: actions/checkout@v4
-
-      # 步骤 2：配置 Python 环境（适配主流版本）
       - name: 配置 Python
         uses: actions/setup-python@v5
         with:
-          python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']  # 多版本兼容测试
-          cache: 'pip'  # 缓存 pip，加速依赖安装
+          python-version: ${{ matrix.python-version }}  # 引用矩阵中的版本
+          cache: 'pip'
 
       # 步骤 3：安装打包/上传工具（无项目依赖，仅需基础工具）
       - name: 安装 build + twine
@@ -40,6 +41,6 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
-          password: pypi-AgEIcHlwaS5vcmcCJDIzOGJkOTg3LTdlYTctNGM5ZC1iOWNkLTlhODI2YWRmNWZkNAACKlszLCJhOWMxNzNmNC1jZjAxLTRmOWEtYWFhYi0wZmM2NDgxNmY4NDciXQAABiA1DE6s5xR90TpPcz2S7THe904bjJQrMyyt9oyKqZVBWQ
+          password: ${{ secrets.PYPI_API_TOKEN }}
           # 可选：测试环境上传（测试时取消注释）
           # repository_url: https://test.pypi.org/legacy/
