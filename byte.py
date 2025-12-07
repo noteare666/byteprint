@@ -119,17 +119,18 @@ def container_byte_dance(content: _Container[_Any], speed: int|float = 30, /, ms
     except TypeError:
         raise TypeError(f"你这迭代对象可真特别呢：{type(content).__name__}\nThis iterable object is quite special: {type(content).__name__}")
 
-def cbd(c: _Container[_Any], s: int|float = 0.03, /) -> None:
+def cbd(c: _Container[_Any], s: int|float = 30, /, m: bool = True) -> None:
     """
     :note: 这是一个名称简化的container_byte_dance函数 / This is a simplified-named version of container_byte_dance
     :param Any c: 简化版content / Simplified content
     :param int|float s: 简化版speed，默认为30 / Simplified speed, default 30
+    :param bool m: 简化版ms_mode，默认为True / Simplified ms_mode, default True
     :note: 具体内容请看被简化的函数 / For details, refer to the original function
     :return: None: 与原函数机制一致 / Consistent with the original function mechanism
     :raises TypeError: 与原函数机制一致 / Consistent with the original function mechanism
     :raises ValueError: 与原函数机制一致 / Consistent with the original function mechanism
     :warning: 与原函数机制一致 / Consistent with the original function mechanism
     """
-    container_byte_dance(c, s)
+    container_byte_dance(c, s, ms_mode = m)
 
 __init__ = bd
